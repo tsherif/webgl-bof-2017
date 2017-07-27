@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">  
+<head>
+  <meta charset="utf-8">
+  <title>WebGL 2 Development with PicoGL.js</title>
+  <link rel="stylesheet" href="css/reveal.min.css">
+  <link rel="stylesheet" href="css/theme/default.css" id="theme"> 
+  <link rel="stylesheet" href="plugin/highlight/styles/docco.css"> 
+  <link rel="icon" type="image/png" href="img/WebGL.png">
+  <style>
+
+    .reveal .slide-number {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .reveal section img {
+      max-height: 400px;
+    }
+
+    .reveal pre {
+      box-shadow: none;
+    }
+
+    .reveal .me {
+      margin-top: 42px;
+    }
+
+    .reveal ul ul {
+      font-size: 0.8em;
+    }
+
+    #rasterization {
+      height: 300px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h1>WebGL 2 Development with PicoGL.js</h1>
+        <p>Tarek Sherif</p>
+        <p>BioDigital</p>
+      </section>
+
+      <section>
+        <h2>BioDigital</h2>
+        <ul>
+          <li>Big, high-detail anatomy visualizations</li>
+          <li>
+            Our male base anatomy contains: 
+            <ul>
+              <li>2230 objects</li>
+              <li>3.3 million trianges</li>
+            </ul>
+          </li>
+        </ul>
+        <img src="img/human.png">
+      </section>
+
+      <section>
+        <h2>BioDigital</h2>
+        <ul>
+          <li>
+            Things we're excited about in WebGL 2:
+            <ul>
+              <li>UBOs</li>
+              <li>Instanced drawing</li>
+              <li>Occusion queries</li>
+              <li>(i.e. reduce number of draws/draw overhead)</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>WebGL 2 is a BIG Update</h2>
+        <ul>
+          <li>New shading language</li>
+          <li>Uniform buffer objects</li>
+          <li>Transform feedback</li>
+          <li>Query objects</li>
+          <li>Multiple render targets</li>
+          <li>etc, etc, etc... </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>How to get started?</h2>
+        <img src="img/rube-webgl.gif">
+      </section>
+
+      <section>
+        <h2>PicoGL.js</h2>
+        <ul>
+          <li>Small (~8kB gzipped)</li>
+          <li>
+            Just manage the rendering layer
+            <ul>
+              <li>No math, scene graph, physics, etc.</li>
+            </ul>
+          </li>
+          <li>
+            Manage location/memory layout
+          </li>
+          <li>
+            Work around implementation bugs
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>PicoGL.js 101</h2>
+            <pre>
+                <code class="javascript">
+  // App manages global GL state
+  var app = PicoGL.createApp(canvas)
+  .clearColor(0.0, 0.0, 0.0, 1.0);
+  
+  // Program, VBO, VAO
+  var program = app.createProgram(vertexShaderSource, fragmentShaderSource);
+  var positions = app.createVertexBuffer(PicoGL.FLOAT, 2, positionData);
+  var vertexArray = app.createVertexArray()
+  .vertexAttributeBuffer(0, positions);
+
+  // Draw call manages per-draw state
+  var drawCall = app.createDrawCall(program, vertexArray);
+
+  app.clear();
+  drawCall.draw();
+              </code>
+            </pre>
+      </section>
+
+      <section>
+        <h2>Raw Uniform Buffer Objects</h2>
+            <pre>
+                <code class="javascript">
+  var uniformsLocation = gl.getUniformBlockIndex(program, "myUniforms");
+  gl.uniformBlockBinding(program, uniformsLocation, 0);
+
+  // HAVE TO KNOW STD140 LAYOUT!!!
+  var uboData = new Float32Array(24);
+  uboData.set(viewProjMatrix);
+  uboData.set(eyePosition, 16);
+  uboData.set(lightPosition, 20);
+
+  var uniformBuffer = gl.createBuffer();
+  gl.bindBufferBase(gl.UNIFORM_BUFFER, 0, uniformBuffer);
+  gl.bufferData(gl.UNIFORM_BUFFER, uboData, gl.STATIC_DRAW);
+              </code>
+            </pre>
+      </section>
+
+            <section>
+        <h2>PicoGL.js Uniform Buffer Objects</h2>
+            <pre>
+                <code class="javascript">
+  // PicoGL.js handles layout.
+  var uniformBuffer = app.createUniformBuffer([
+      PicoGL.FLOAT_MAT4,
+      PicoGL.FLOAT_VEC4,
+      PicoGL.FLOAT_VEC4
+  ])
+  .set(0, viewProjMatrix)
+  .set(1, eyePosition)
+  .set(2, lightPosition)
+  .update();
+
+  drawCall.uniformBlock("myUniforms", uniformBuffer);
+              </code>
+            </pre>
+      </section>
+
+      <section>
+        <h2>Thanks!</h2>
+        Some Resources:
+        <ul>
+          <li>Website: <a target="_blank" href="https://tsherif.github.io/picogl.js/">tsherif.github.io/picogl.js/</a></li>
+          <li>GitHub: <a target="_blank" href="https://github.com/tsherif/picogl.js">github.com/tsherif/picogl.js</a></li>
+          <li>Tutorial: <a target="_blank" href="https://tsherif.wordpress.com/2017/07/26/webgl-2-development-with-picogl-js/">WebGL 2 Development with PicoGL.js</a></li>
+          <li>API Docs: <a target="_blank" href="https://tsherif.github.io/picogl.js/docs/">tsherif.github.io/picogl.js/docs/</a></li>
+          <li>Twitter: <a target="_blank" href="https://twitter.com/thsherif">@thsherif</a></li>
+          <li>Email: <a href="mailto:tarek@biodigital.com">tarek@biodigital.com</a></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  <script src="lib/js/head.min.js"></script>
+  <script src="js/reveal.min.js"></script>
+  <script src="js/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      history: true,
+      slideNumber: true,
+      controls: false
+    });
+
+    Reveal.addEventListener("slidechanged", function(event) {
+      window.onresize();
+    });
+
+    hljs.initHighlightingOnLoad();
+    
+  </script>
+</body>
+</html>
