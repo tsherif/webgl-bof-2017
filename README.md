@@ -1,1 +1,1 @@
-Khronos NY WebGL Workshop 1
+WebGL BOF Presentation 2017
