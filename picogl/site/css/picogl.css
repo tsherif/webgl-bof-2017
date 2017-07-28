@@ -1,0 +1,41 @@
+h1 {
+    margin-bottom: 11px;
+}
+
+.description {
+    width: 96%;
+    margin-bottom: 1em;
+}
+
+#examples {
+    display: block;
+    width: 800px;
+    height: 600px;
+    overflow: hidden;
+    margin-top: 0.8em;
+}
+
+#example-div {
+    position: relative;
+}
+
+#example-title {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    background-color: gray;
+    padding: 0.5em;
+}
+
+.example-menu-button {
+    display: inline-block;
+    background-color: gray;
+    color: white;
+    text-decoration: none;
+    padding: 0.4em;
+}
+
+.badge-link {
+    text-decoration: none;
+}
